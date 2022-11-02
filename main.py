@@ -10,19 +10,16 @@ from config import *
 
 sg.theme('BrownBlue')
 
-# user_folder = "/Users/minimusiker/"
 folderToTracklist = os.path.join(os.path.join(os.path.expanduser('~')), 'Downloads')
-# desktop = "~/Desktop/"
 desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
 link = []
 song = []
 klasse = []
 
-
+# gui layout
 layout = [  [sg.Text('Pfad MIXFERTIG:')],
-            # [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=nas_folder, s=10)],
-            [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', s=10)],
+            [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10)],
             [sg.Text('Schul-ID:')],
             [sg.InputText(key='-schoolID-')],
             [sg.Text('Schul-Name:')],
@@ -182,6 +179,7 @@ while True:
         file.close()
 
         # # upload files to mysql -> file using customer_id(schoolID), event_id
+        # soon to come
 
         # # copy csv and txt files to dropbox
         shutil.move(("./" + txtFile), cache_folder)
@@ -192,18 +190,19 @@ while True:
             if foldername.startswith("cache_"):
                 os.rename(os.path.join(desktop, foldername), os.path.join(desktop, foldername).replace(("cache_MM"+schoolID), ("MM"+schoolID+" "+schoolName)))
 
-        # # # duplicate full folder to dropbox
-        # command1 = """ osascript -e '
-        # set dropboxFolder to "Macintosh HD:Users:minimusiker:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
-        # set desktopFolder to (path to desktop)
-        # set theString to "MM"
-        # tell application "Finder"
-        #     activate
-        #     set matchingFolder to ((every folder in desktop) whose name begins with theString) as text
-        #     duplicate (folder matchingFolder) to dropboxFolder
-        # end tell
-        # '"""
-        # os.system(command1)
+        # # duplicate full folder to dropbox
+        command1 = """ osascript -e '
+        set dropboxFolder to "Macintosh HD:Users:minimusiker:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
+        set desktopFolder to (path to desktop)
+        set theFolder to "MM"
+        tell application "Finder"
+            activate
+            set matchingFolder to ((every folder in desktop) whose name begins with theFolder) as text
+            duplicate (folder matchingFolder) to dropboxFolder
+        end tell
+        '"""
+        
+        os.system(command1)
 
         # # rename mp3Folder to ftpFolder (mp3 -> 1170)
         base = desktop + "/MM" + str(schoolID) + " " + schoolName
@@ -211,36 +210,36 @@ while True:
         uploadFolder = base + "/" + str(schoolID)
         os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('mp3', schoolID))
 
-    #     # # upload mp3Folder to ftp server
-    #     print("Creating mp3 folder on ftp server!")
-    #     ftp.mkd(schoolID)
-    #     ftp.cwd(schoolID)
+        # # upload mp3Folder to ftp server
+        print("Creating mp3 folder on ftp server!")
+        ftp.mkd(schoolID)
+        ftp.cwd(schoolID)
 
-    #     def uploadThis(uploadFolder):
-    #         files = os.listdir(uploadFolder)
-    #         os.chdir(uploadFolder)
-    #         for f in files:
-    #             print("Uploading...", f)
-    #             if os.path.isfile(uploadFolder + r'/{}'.format(f)):
-    #                 fh = open(f, 'rb')
-    #                 ftp.storbinary('STOR %s' % f, fh)
-    #                 fh.close()
-    #             elif os.path.isdir(uploadFolder + r'/{}'.format(f)):
-    #                 ftp.mkd(f)
-    #                 ftp.cwd(f)
-    #                 uploadThis(uploadFolder + r'/{}'.format(f))
-    #         ftp.cwd('..')
-    #         os.chdir('..')
+        def uploadThis(uploadFolder):
+            files = os.listdir(uploadFolder)
+            os.chdir(uploadFolder)
+            for f in files:
+                print("Uploading...", f)
+                if os.path.isfile(uploadFolder + r'/{}'.format(f)):
+                    fh = open(f, 'rb')
+                    ftp.storbinary('STOR %s' % f, fh)
+                    fh.close()
+                elif os.path.isdir(uploadFolder + r'/{}'.format(f)):
+                    ftp.mkd(f)
+                    ftp.cwd(f)
+                    uploadThis(uploadFolder + r'/{}'.format(f))
+            ftp.cwd('..')
+            os.chdir('..')
 
-    #     uploadThis(uploadFolder)
-    #     ftp.quit()
+        uploadThis(uploadFolder)
+        ftp.quit()
 
-    #     # # delete cache Folder 
-    #     try:
-    #         shutil.rmtree(base)
-    #     except OSError as e:
-    #         print("Error: %s - %s." % (e.filename, e.strerror))
-    #     break
-    # print("Job done!")
+        # # delete cache Folder 
+        try:
+            shutil.rmtree(base)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
+        break
+    print("Job done!")
 
 window.close()

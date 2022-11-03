@@ -44,6 +44,7 @@ while True:
     cache_folder = desktop + "/cache_MM" + schoolID
 
     if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+        print("abort. see you next time!")
         break
 
     dirNAS = values['-dirNAS-']
@@ -92,154 +93,170 @@ while True:
         except:
             print("kein pfad vorhanden")
 
-        # # Convert wav to mp3
-        conv = mp3_converter(cache_folder, ".wav", "mp3")
-        conv.lower_underscore()
-        conv.mp3()
+        print("\n-------------------------------------------------------------")
+        print("wav check!!!")
+        print("waiting for user input ...")
+        print("-------------------------------------------------------------\n")
+        userInput = input("go? [yes|no] ")
 
-        # # Rename mp3s in cache_schoolID and move to /mp3
-        mp3_folder = cache_folder + "/mp3"
-        if not os.path.exists(mp3_folder):
-            os.makedirs(mp3_folder)
-        for filename in os.listdir(cache_folder):
-            if (filename.endswith(".mp3")):
-                source = os.path.join(cache_folder, filename)
-                shutil.move(source, mp3_folder)
-        os.listdir(mp3_folder)
-        for f in os.listdir(mp3_folder):
-            os.rename(os.path.join(mp3_folder, f), os.path.join(mp3_folder, f).replace('§', ' ').title().replace('.Mp3', '.mp3'))
-
-        # # Rename wavs in cache_schoolID and move to /wav
-        wav_folder = cache_folder + "/wav"
-        if not os.path.exists(wav_folder):
-            os.makedirs(wav_folder)
-        for filename in os.listdir(cache_folder):
-            if (filename.endswith(".wav")):
-                source = os.path.join(cache_folder, filename)
-                shutil.move(source, wav_folder)
-        os.listdir(wav_folder)
-        for f in os.listdir(wav_folder):
-            os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
-
-        # # zip mp3 files
-        os.path.join(mp3_folder, shutil.make_archive("AlleLieder", 'zip', mp3_folder))
-        shutil.move(("./AlleLieder.zip"), mp3_folder)
-
-        # # build csv and txt with links to upload to dropbox
-        while True:
-            lines = os.listdir(mp3_folder)
-            for mp3s in lines:
-                link.append("https://www.hoerthin.de/mp3/" + schoolID + "/" + mp3s.replace(" ", "%20"))
-            link.sort()
-            for i in song:
-                print(i)
-
-            csvFile = schoolID + "_mp3Liste.csv"
-
-            # # Excel Tabelle Admin-Tool lesen
-            excel_file = openpyxl.load_workbook(tracklist)
-            sheet_obj = excel_file.active
-            m_row = sheet_obj.max_row
-
-            # Tracklist-Daten
-            # name = input("schoolID: ")
-            txtFile = schoolID + "_tracklist.txt"
-            txt_file = open(txtFile, "w")
-
-            j = 1
-
-            for i in range(2, m_row + 1):
-                cell_obj = sheet_obj.cell(row = i, column = 1)
-                song.append(cell_obj.value)
-                cell_obj2 = sheet_obj.cell(row = i, column = 2)
-                klasse.append(cell_obj2.value)
-                try:
-                    full_row = str(j).zfill(2) + " " + cell_obj.value + " " + "(" + cell_obj2.value + ")\n" # optional for copy from txt-file, saved in original path
-                    txt_file.write(str(full_row)) # write to .txt if 3 columns (titel + (klasse))
-                except:
-                    full_row2 = str(j).zfill(2) + " " + cell_obj.value + "\n"
-                    txt_file.write(str(full_row2)) # write to .txt if 2 columns (alle kinder singen alle songs)
-                
-                j += 1
-
-            song.append("Alle Lieder")
-            klasse.append(" ")
-            link.append("https://www.hoerthin.de/mp3/Minimusikersong.mp3")
-            song.append("Minimusikersong")
-            klasse.append("Minimusiker")
-
-            data = [link, song, klasse]
-            export_data = zip_longest(*data, fillvalue = '')
-            with open(csvFile, 'w', newline='') as file:
-                write = csv.writer(file)
-                write.writerows(export_data)
-
+        if userInput == "no" or userInput == "No" or userInput == "NO" or userInput == "n":
+            # # delete cache Folder 
+            try:
+                shutil.rmtree(cache_folder)
+            except OSError as e:
+                print("Error: %s - %s." % (e.filename, e.strerror))
+            print("cache_folder on desktop deleted. see you next time!")
             break
-        txt_file.close()
-        file.close()
 
-        # # upload files to mysql -> file using customer_id(schoolID), event_id
-        # soon to come
+        elif userInput == "yes" or userInput == "Yes" or userInput == "YES" or userInput == "y":
+            # # Convert wav to mp3
+            conv = mp3_converter(cache_folder, ".wav", "mp3")
+            conv.lower_underscore()
+            conv.mp3()
 
-        # # copy csv and txt files to dropbox
-        shutil.move(("./" + txtFile), cache_folder)
-        shutil.move(("./" + csvFile), cache_folder)
+            # # Rename mp3s in cache_schoolID and move to /mp3
+            mp3_folder = cache_folder + "/mp3"
+            if not os.path.exists(mp3_folder):
+                os.makedirs(mp3_folder)
+            for filename in os.listdir(cache_folder):
+                if (filename.endswith(".mp3")):
+                    source = os.path.join(cache_folder, filename)
+                    shutil.move(source, mp3_folder)
+            os.listdir(mp3_folder)
+            for f in os.listdir(mp3_folder):
+                os.rename(os.path.join(mp3_folder, f), os.path.join(mp3_folder, f).replace('§', ' ').title().replace('.Mp3', '.mp3'))
 
-        # # rename cache_folder+schoolID to schoolID
-        for foldername in os.listdir(desktop):
-            if foldername.startswith("cache_"):
-                os.rename(os.path.join(desktop, foldername), os.path.join(desktop, foldername).replace(("cache_MM"+schoolID), ("MM"+schoolID+" "+schoolName)))
+            # # Rename wavs in cache_schoolID and move to /wav
+            wav_folder = cache_folder + "/wav"
+            if not os.path.exists(wav_folder):
+                os.makedirs(wav_folder)
+            for filename in os.listdir(cache_folder):
+                if (filename.endswith(".wav")):
+                    source = os.path.join(cache_folder, filename)
+                    shutil.move(source, wav_folder)
+            os.listdir(wav_folder)
+            for f in os.listdir(wav_folder):
+                os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
 
-        # # duplicate full folder to dropbox
-        command1 = """ osascript -e '
-        set dropboxFolder to "Macintosh HD:Users:minimusiker:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
-        set desktopFolder to (path to desktop)
-        set theFolder to "MM"
-        tell application "Finder"
-            activate
-            set matchingFolder to ((every folder in desktop) whose name begins with theFolder) as text
-            duplicate (folder matchingFolder) to dropboxFolder
-        end tell
-        '"""
-        
-        os.system(command1)
+            # # zip mp3 files
+            os.path.join(mp3_folder, shutil.make_archive("AlleLieder", 'zip', mp3_folder))
+            shutil.move(("./AlleLieder.zip"), mp3_folder)
 
-        # # rename mp3Folder to ftpFolder (mp3 -> 1170)
-        base = desktop + "/MM" + str(schoolID) + " " + schoolName
-        mp3Folder = base + "/mp3"
-        uploadFolder = base + "/" + str(schoolID)
-        os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('mp3', schoolID))
+            # # build csv and txt with links to upload to dropbox
+            while True:
+                lines = os.listdir(mp3_folder)
+                for mp3s in lines:
+                    link.append("https://www.hoerthin.de/mp3/" + schoolID + "/" + mp3s.replace(" ", "%20"))
+                link.sort()
+                for i in song:
+                    print(i)
 
-        # # upload mp3Folder to ftp server
-        print("Creating mp3 folder on ftp server!")
-        ftp.mkd(schoolID)
-        ftp.cwd(schoolID)
+                csvFile = schoolID + "_mp3Liste.csv"
 
-        def uploadThis(uploadFolder):
-            files = os.listdir(uploadFolder)
-            os.chdir(uploadFolder)
-            for f in files:
-                print("Uploading...", f)
-                if os.path.isfile(uploadFolder + r'/{}'.format(f)):
-                    fh = open(f, 'rb')
-                    ftp.storbinary('STOR %s' % f, fh)
-                    fh.close()
-                elif os.path.isdir(uploadFolder + r'/{}'.format(f)):
-                    ftp.mkd(f)
-                    ftp.cwd(f)
-                    uploadThis(uploadFolder + r'/{}'.format(f))
-            ftp.cwd('..')
-            os.chdir('..')
+                # # Excel Tabelle Admin-Tool lesen
+                excel_file = openpyxl.load_workbook(tracklist)
+                sheet_obj = excel_file.active
+                m_row = sheet_obj.max_row
 
-        uploadThis(uploadFolder)
-        ftp.quit()
+                # Tracklist-Daten
+                # name = input("schoolID: ")
+                txtFile = schoolID + "_tracklist.txt"
+                txt_file = open(txtFile, "w")
 
-        # # delete cache Folder 
-        try:
-            shutil.rmtree(base)
-        except OSError as e:
-            print("Error: %s - %s." % (e.filename, e.strerror))
-        break
-    print("Job done!")
+                j = 1
+
+                for i in range(2, m_row + 1):
+                    cell_obj = sheet_obj.cell(row = i, column = 1)
+                    song.append(cell_obj.value)
+                    cell_obj2 = sheet_obj.cell(row = i, column = 2)
+                    klasse.append(cell_obj2.value)
+                    try:
+                        full_row = str(j).zfill(2) + " " + cell_obj.value + " " + "(" + cell_obj2.value + ")\n" # optional for copy from txt-file, saved in original path
+                        txt_file.write(str(full_row)) # write to .txt if 3 columns (titel + (klasse))
+                    except:
+                        full_row2 = str(j).zfill(2) + " " + cell_obj.value + "\n"
+                        txt_file.write(str(full_row2)) # write to .txt if 2 columns (alle kinder singen alle songs)
+                    
+                    j += 1
+
+                song.append("Alle Lieder")
+                klasse.append(" ")
+                link.append("https://www.hoerthin.de/mp3/Minimusikersong.mp3")
+                song.append("Minimusikersong")
+                klasse.append("Minimusiker")
+
+                data = [link, song, klasse]
+                export_data = zip_longest(*data, fillvalue = '')
+                with open(csvFile, 'w', newline='') as file:
+                    write = csv.writer(file)
+                    write.writerows(export_data)
+
+                break
+            txt_file.close()
+            file.close()
+
+            # # upload files to mysql -> file using customer_id(schoolID), event_id
+            # soon to come
+
+            # # copy csv and txt files to dropbox
+            shutil.move(("./" + txtFile), cache_folder)
+            shutil.move(("./" + csvFile), cache_folder)
+
+            # # rename cache_folder+schoolID to schoolID
+            for foldername in os.listdir(desktop):
+                if foldername.startswith("cache_"):
+                    os.rename(os.path.join(desktop, foldername), os.path.join(desktop, foldername).replace(("cache_MM"+schoolID), ("MM"+schoolID+" "+schoolName)))
+
+            # # duplicate full folder to dropbox
+            command1 = """ osascript -e '
+            set dropboxFolder to "Macintosh HD:Users:minimusiker:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
+            set desktopFolder to (path to desktop)
+            set theFolder to "MM"
+            tell application "Finder"
+                activate
+                set matchingFolder to ((every folder in desktop) whose name begins with theFolder) as text
+                duplicate (folder matchingFolder) to dropboxFolder
+            end tell
+            '"""
+            
+            os.system(command1)
+
+            # # rename mp3Folder to ftpFolder (mp3 -> 1170)
+            base = desktop + "/MM" + str(schoolID) + " " + schoolName
+            mp3Folder = base + "/mp3"
+            uploadFolder = base + "/" + str(schoolID)
+            os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('mp3', schoolID))
+
+            # # upload mp3Folder to ftp server
+            print("Creating mp3 folder on ftp server!")
+            ftp.mkd(schoolID)
+            ftp.cwd(schoolID)
+
+            def uploadThis(uploadFolder):
+                files = os.listdir(uploadFolder)
+                os.chdir(uploadFolder)
+                for f in files:
+                    print("Uploading...", f)
+                    if os.path.isfile(uploadFolder + r'/{}'.format(f)):
+                        fh = open(f, 'rb')
+                        ftp.storbinary('STOR %s' % f, fh)
+                        fh.close()
+                    elif os.path.isdir(uploadFolder + r'/{}'.format(f)):
+                        ftp.mkd(f)
+                        ftp.cwd(f)
+                        uploadThis(uploadFolder + r'/{}'.format(f))
+                ftp.cwd('..')
+                os.chdir('..')
+
+            uploadThis(uploadFolder)
+            ftp.quit()
+
+            # # delete cache Folder 
+            try:
+                shutil.rmtree(base)
+            except OSError as e:
+                print("Error: %s - %s." % (e.filename, e.strerror))
+            print("Job done!")
+            break
 
 window.close()

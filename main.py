@@ -11,7 +11,6 @@ from ftplib import FTP_TLS
 from config import *
 
 
-
 sg.theme('BrownBlue')
 
 folderToTracklist = os.path.join(os.path.join(os.path.expanduser('~')), 'Downloads')
@@ -77,7 +76,7 @@ while True:
             print("Connecting to minimusiker ftp server!") 
             ftp = FTP_TLS(FTP_HOST, timeout=5)
             passwd = getpass("Enter your password: ")
-            ftp.login(FTP_USER, passwd)   # login before securing channel
+            ftp.login(FTP_USER, passwd)
             ftp.prot_p()  
             ftp.encoding = "utf-8"
             ftp.cwd("htdocs/hoerthin/mp3")

@@ -6,7 +6,11 @@ import openpyxl
 import csv
 from itertools import zip_longest
 import ftplib
+from getpass import getpass
+from ftplib import FTP_TLS
 from config import *
+
+
 
 sg.theme('BrownBlue')
 
@@ -70,13 +74,16 @@ while True:
     if event == '-START-' and dirNAS != "" and schoolID != "" and tracklist != "":
 
         try:
-            print("Connecting to minimusiker ftp server!")
-            ftp = ftplib.FTP(FTP_HOST, FTP_USER, FTP_PASS)
+            print("Connecting to minimusiker ftp server!") 
+            ftp = FTP_TLS(FTP_HOST, timeout=5)
+            passwd = getpass("Enter your password: ")
+            ftp.login(FTP_USER, passwd)   # login before securing channel
+            ftp.prot_p()  
             ftp.encoding = "utf-8"
             ftp.cwd("htdocs/hoerthin/mp3")
             print("Connection success! Directory: htdocs/hoerthin/mp3")
-        except:
-            print("Failed to connect to ftp server")
+        except ftplib.all_errors as e:
+            print('FTP error:', e)
 
         # # create cache folder on desktop with cache_schoolID
         try:

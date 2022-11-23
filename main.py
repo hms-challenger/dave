@@ -6,9 +6,9 @@ import openpyxl
 import csv
 from itertools import zip_longest
 import ftplib
-from getpass import getpass
+# import getpass
 from ftplib import FTP_TLS
-from config import *
+from config import FTP_HOST, FTP_USER, FTP_PASS
 
 
 sg.theme('BrownBlue')
@@ -75,8 +75,8 @@ while True:
         try:
             print("Connecting to minimusiker ftp server!") 
             ftp = FTP_TLS(FTP_HOST, timeout=5)
-            passwd = getpass("Enter your password: ")
-            ftp.login(FTP_USER, passwd)
+            # passwd = getpass("Enter your password: ")
+            ftp.login(FTP_USER, FTP_PASS)
             ftp.prot_p()  
             ftp.encoding = "utf-8"
             ftp.cwd("htdocs/hoerthin/mp3")

@@ -9,3 +9,7 @@ little helper at work (currently my most useful script. even my collegues know h
 - upload to ftp-server
 - stores url's in csv-file for further use
 - stores tracklist in txt-file for further use
+
+## to do!
+- fix ftp server timeout
+- put ftp connection and upload to server at the end

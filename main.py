@@ -5,11 +5,6 @@ import PySimpleGUI as sg
 import openpyxl
 import csv
 from itertools import zip_longest
-import ftplib
-# import getpass
-from ftplib import FTP_TLS
-from config import FTP_HOST, FTP_USER, FTP_PASS
-
 
 sg.theme('BrownBlue')
 
@@ -71,18 +66,6 @@ while True:
             print('Keine Pfad -> Tracklist!')
 
     if event == '-START-' and dirNAS != "" and schoolID != "" and tracklist != "":
-
-        try:
-            print("Connecting to minimusiker ftp server!") 
-            ftp = FTP_TLS(FTP_HOST, timeout=5)
-            # passwd = getpass("Enter your password: ")
-            ftp.login(FTP_USER, FTP_PASS)
-            ftp.prot_p()  
-            ftp.encoding = "utf-8"
-            ftp.cwd("htdocs/hoerthin/mp3")
-            print("Connection success! Directory: htdocs/hoerthin/mp3")
-        except ftplib.all_errors as e:
-            print('FTP error:', e)
 
         # # create cache folder on desktop with cache_schoolID
         try:
@@ -226,43 +209,7 @@ while True:
             '"""
             
             os.system(command1)
-
-            # # rename mp3Folder to ftpFolder (mp3 -> 1170)
-            base = desktop + "/MM" + str(schoolID) + " " + schoolName
-            mp3Folder = base + "/mp3"
-            uploadFolder = base + "/" + str(schoolID)
-            os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('mp3', schoolID))
-
-            # # upload mp3Folder to ftp server
-            print("Creating mp3 folder on ftp server!")
-            ftp.mkd(schoolID)
-            ftp.cwd(schoolID)
-
-            def uploadThis(uploadFolder):
-                files = os.listdir(uploadFolder)
-                os.chdir(uploadFolder)
-                for f in files:
-                    print("Uploading...", f)
-                    if os.path.isfile(uploadFolder + r'/{}'.format(f)):
-                        fh = open(f, 'rb')
-                        ftp.storbinary('STOR %s' % f, fh)
-                        fh.close()
-                    elif os.path.isdir(uploadFolder + r'/{}'.format(f)):
-                        ftp.mkd(f)
-                        ftp.cwd(f)
-                        uploadThis(uploadFolder + r'/{}'.format(f))
-                ftp.cwd('..')
-                os.chdir('..')
-
-            uploadThis(uploadFolder)
-            ftp.quit()
-
-            # # delete cache Folder 
-            try:
-                shutil.rmtree(base)
-            except OSError as e:
-                print("Error: %s - %s." % (e.filename, e.strerror))
-            print("Job done!")
-            break
-
+            from ftp_upload import *
+            os.system("ftp_upload.py 1")
+            
 window.close()

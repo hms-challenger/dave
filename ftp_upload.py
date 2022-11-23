@@ -40,8 +40,8 @@ for folderName in os.listdir(desktop):
     if folderName.startswith("MM"):
         splitFolderName = folderName.split()
         schoolID = splitFolderName[0][2:]
-        schoolName = splitFolderName[1]
-    
+        schoolName = folderName[7:]
+
 base = desktop + "/MM" + schoolID + " " + schoolName
 mp3Folder = base + "/mp3"
 uploadFolder = base + "/" + str(schoolID)
@@ -51,7 +51,7 @@ os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('m
 print("Creating mp3 folder on ftp server!")
 ftp.mkd(schoolID)
 ftp.cwd(schoolID)
-# uploadThis(uploadFolder)
+uploadThis(uploadFolder)
 
 ftp.quit()
 
@@ -61,4 +61,6 @@ try:
     print("cache folder deleted!")
 except OSError as e:
     print("Error: %s - %s." % (e.filename, e.strerror))
+
 print("Job done!")
+exit(0)

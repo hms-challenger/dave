@@ -11,5 +11,6 @@ little helper at work (currently my most useful script. even my collegues know h
 - stores tracklist in txt-file for further use
 
 ## to do!
-- fix ftp server timeout
-- put ftp connection and upload to server at the end
+- fix ftp server timeout -> done
+- put ftp connection and upload to server at the end -> done
+- delete from main.py -> done

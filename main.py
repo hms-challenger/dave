@@ -67,6 +67,34 @@ while True:
 
     if event == '-START-' and dirNAS != "" and schoolID != "" and tracklist != "":
 
+        # # Excel Tabelle Admin-Tool lesen
+        excel_file = openpyxl.load_workbook(tracklist)
+        sheet_obj = excel_file.active
+        m_row = sheet_obj.max_row
+
+        # Tracklist-Daten
+        txtFile = schoolID + "_tracklist.txt"
+        txt_file = open(txtFile, "w")
+
+        j = 1
+
+        for i in range(2, m_row + 1):
+            cell_obj = sheet_obj.cell(row = i, column = 1)
+            song.append(cell_obj.value)
+            cell_obj2 = sheet_obj.cell(row = i, column = 2)
+            klasse.append(cell_obj2.value)
+            try:
+                full_row = str(j).zfill(2) + " " + cell_obj.value + " " + "(" + cell_obj2.value + ")\n" # optional for copy from txt-file, saved in original path
+                txt_file.write(str(full_row)) # write to .txt if 3 columns (titel + (klasse))
+            except:
+                full_row2 = str(j).zfill(2) + " " + cell_obj.value + "\n"
+                txt_file.write(str(full_row2)) # write to .txt if 2 columns (alle kinder singen alle songs)
+            
+            j += 1
+
+        txt_file.close()
+        shutil.move(("./" + txtFile), desktop)
+
         # # create cache folder on desktop with cache_schoolID
         try:
             os.mkdir(cache_folder)
@@ -83,18 +111,20 @@ while True:
             print("kein pfad vorhanden")
 
         print("\n-------------------------------------------------------------")
-        print("wav check!!!")
-        print("waiting for user input ...")
+        print("1. wav check!")
+        print("2. copy tracklist to clipboard!")
+        print("\n... waiting for user input ...")
+        userInput = input("3. go? [yes|no] ")
         print("-------------------------------------------------------------\n")
-        userInput = input("go? [yes|no] ")
 
         if userInput == "no" or userInput == "No" or userInput == "NO" or userInput == "n":
             # # delete cache Folder 
             try:
                 shutil.rmtree(cache_folder)
+                os.remove(desktop + "/" + txtFile)
             except OSError as e:
                 print("Error: %s - %s." % (e.filename, e.strerror))
-            print("cache_folder on desktop deleted. see you next time!")
+            print("cache_folder and txt-file on desktop deleted. see you next time!")
             break
 
         elif userInput == "yes" or userInput == "Yes" or userInput == "YES" or userInput == "y":
@@ -137,36 +167,8 @@ while True:
                 for mp3s in lines:
                     link.append("https://www.hoerthin.de/mp3/" + schoolID + "/" + mp3s.replace(" ", "%20"))
                 link.sort()
-                for i in song:
-                    print(i)
 
                 csvFile = schoolID + "_mp3Liste.csv"
-
-                # # Excel Tabelle Admin-Tool lesen
-                excel_file = openpyxl.load_workbook(tracklist)
-                sheet_obj = excel_file.active
-                m_row = sheet_obj.max_row
-
-                # Tracklist-Daten
-                # name = input("schoolID: ")
-                txtFile = schoolID + "_tracklist.txt"
-                txt_file = open(txtFile, "w")
-
-                j = 1
-
-                for i in range(2, m_row + 1):
-                    cell_obj = sheet_obj.cell(row = i, column = 1)
-                    song.append(cell_obj.value)
-                    cell_obj2 = sheet_obj.cell(row = i, column = 2)
-                    klasse.append(cell_obj2.value)
-                    try:
-                        full_row = str(j).zfill(2) + " " + cell_obj.value + " " + "(" + cell_obj2.value + ")\n" # optional for copy from txt-file, saved in original path
-                        txt_file.write(str(full_row)) # write to .txt if 3 columns (titel + (klasse))
-                    except:
-                        full_row2 = str(j).zfill(2) + " " + cell_obj.value + "\n"
-                        txt_file.write(str(full_row2)) # write to .txt if 2 columns (alle kinder singen alle songs)
-                    
-                    j += 1
 
                 song.append("Alle Lieder")
                 klasse.append(" ")
@@ -181,14 +183,14 @@ while True:
                     write.writerows(export_data)
 
                 break
-            txt_file.close()
+            # txt_file.close()
             file.close()
 
-            # # upload files to mysql -> file using customer_id(schoolID), event_id
+            # upload files to mysql -> file using customer_id(schoolID), event_id
             # soon to come
 
-            # # copy csv and txt files to dropbox
-            shutil.move(("./" + txtFile), cache_folder)
+            # # copy csv and txt files to cache folder
+            shutil.move((desktop + "/" + txtFile), cache_folder)
             shutil.move(("./" + csvFile), cache_folder)
 
             # # rename cache_folder+schoolID to schoolID

@@ -38,11 +38,10 @@ desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
 for folderName in os.listdir(desktop):
     if folderName.startswith("MM"):
+        base = desktop + "/" + folderName
         splitFolderName = folderName.split()
         schoolID = splitFolderName[0][2:]
-        schoolName = folderName[7:]
 
-base = desktop + "/MM" + schoolID + " " + schoolName
 mp3Folder = base + "/mp3"
 uploadFolder = base + "/" + str(schoolID)
 os.rename(os.path.join(base, mp3Folder), os.path.join(base, schoolID).replace('mp3', schoolID))

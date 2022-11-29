@@ -6,7 +6,9 @@ import openpyxl
 import csv
 from itertools import zip_longest
 
-sg.theme('BrownBlue')
+sg.theme('LightGrey1')
+font = ("Arial", 13)
+button_color = "grey"
 
 folderToTracklist = os.path.join(os.path.join(os.path.expanduser('~')), 'Downloads')
 desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
@@ -16,28 +18,27 @@ song = []
 klasse = []
 
 # gui layout
-layout1 = [[sg.Text('Pfad MIXFERTIG:')],
-        [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10)],
-        [sg.Text('Schul-ID:')],
+layout1 = [[sg.Text('Pfad MIXFERTIG:', font=font)],
+        [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10, button_color=button_color)],
+        [sg.Text('Schul-ID:', font=font)],
         [sg.InputText(key='-schoolID-')],
-        [sg.Text('Schul-Name:')],
+        [sg.Text('Schul-Name:', font=font)],
         [sg.InputText(key='-schoolName-')],
-        [sg.Text('Pfad TRACKLIST ADMINTOOL:')], 
-        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, s=10)],
+        [sg.Text('Pfad TRACKLIST ADMINTOOL:', font=font)], 
+        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, s=10, button_color=button_color)],
         [sg.T("        ")],
-        [sg.Radio('Ganzjahr', "RADIO1", default=False, key="-RADIO1-"), sg.Radio('Xmas', "RADIO1", default=True, key="-RADIO2-")],
+        [sg.Radio('Ganzjahr', "RADIO1", default=False, key="-RADIO1-", font=font), sg.Radio('Xmas', "RADIO1", default=True, key="-RADIO2-", font=font)],
         [sg.T("        ")],
-        [sg.Button('OK!', key="-START-", s=(15,1.2)), sg.Button('Cancel', key="-CANCEL-", s=(15,1.2))]]
+        [sg.Button('OK!', key="-START-", s=(15,1.2), button_color=button_color), sg.Button('Cancel', key="-CANCEL-", s=(15,1.2), button_color=button_color)]]
 
-layout2 = [[sg.Text('Schul-ID:')],
+layout2 = [[sg.Text('Schul-ID:', font=font)],
         [sg.InputText(key='-schoolID2-')],
-        [sg.Text('Pfad TRACKLIST ADMINTOOL:')], 
+        [sg.Text('Pfad TRACKLIST ADMINTOOL:', font=font)], 
         [sg.Input(), sg.FileBrowse('Browse', key='-dirTL2-', initial_folder=folderToTracklist, s=10)],
         [sg.T("        ", size=(10,13))],
         [sg.Button('OK!', key="-START2-", s=(15,1.2)), sg.Button('Cancel', key="-CANCEL2-", s=(15,1.2))]]
 
-tabgrp = [[sg.TabGroup([[sg.Tab('DAVEfull', layout1),
-                        sg.Tab('Tracklist only', layout2)]])]] 
+tabgrp = [[sg.TabGroup([[sg.Tab('DAVE', layout1), sg.Tab('tracklist only', layout2)]], font=font)]] 
 
 window = sg.Window('DAVE', tabgrp)
 
@@ -52,17 +53,24 @@ while True:
     schoolID = values['-schoolID-']
     schoolName = values['-schoolName-']
     tracklist = values['-dirTL-']
-
-    schoolID2 = values['-schoolID2-'].zfill(4)
+    schoolID2 = values['-schoolID2-']
     tracklist2 = values['-dirTL2-']
-
-    cache_folder = desktop + "/cache_MM" + schoolID
 
     if event == sg.WIN_CLOSED or event == '-CANCEL-' or event == '-CANCEL2-': # if user closes window or clicks cancel
         print("abort. see you next time!")
         break
 
     if event == "-START2-":
+        if schoolID2 == "":
+            print('Keine School-ID')
+        else:
+            try:
+                schoolID2 = int(schoolID2)
+                schoolID2 = str(schoolID2).zfill(4)
+                print(schoolID2)
+            except OSError:
+                pass
+
         if tracklist2 == "":
             print('Kein Pfad -> Tracklist!')
         else:
@@ -102,10 +110,18 @@ while True:
     if dirNAS == "":
         print('Kein Pfad -> MIXFERTIG!')
 
-    schoolID = values['-schoolID-']
     if schoolID == "":
-        print('Keine Schul-ID!')
-
+        print('Keine School-ID')
+    else:
+        try:
+            schoolIDint = int(values['-schoolID-'])
+            schoolID = str(schoolID).zfill(4)
+            cache_folder = desktop + "/cache_MM" + schoolID
+            print(schoolID)
+            print(cache_folder)
+        except OSError:
+            pass
+        
     schoolName = values['-schoolName-']
     if schoolName == "":
         print("Kein Schulname!")

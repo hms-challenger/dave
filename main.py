@@ -16,17 +16,30 @@ song = []
 klasse = []
 
 # gui layout
-layout = [  [sg.Text('Pfad MIXFERTIG:')],
-            [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10)],
-            [sg.Text('Schul-ID:')],
-            [sg.InputText(key='-schoolID-')],
-            [sg.Text('Schul-Name:')],
-            [sg.InputText(key='-schoolName-')],
-            [sg.Text('Pfad TRACKLIST ADMINTOOL:')], 
-            [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, s=10)],
-            [sg.Button('OK!', key="-START-", s=15), sg.Button('Cancel', s=15)] ]
+layout1 = [[sg.Text('Pfad MIXFERTIG:')],
+        [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10)],
+        [sg.Text('Schul-ID:')],
+        [sg.InputText(key='-schoolID-')],
+        [sg.Text('Schul-Name:')],
+        [sg.InputText(key='-schoolName-')],
+        [sg.Text('Pfad TRACKLIST ADMINTOOL:')], 
+        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, s=10)],
+        [sg.T("        ")],
+        [sg.Radio('Ganzjahr', "RADIO1", default=False, key="-RADIO1-"), sg.Radio('Xmas', "RADIO1", default=True, key="-RADIO2-")],
+        [sg.T("        ")],
+        [sg.Button('OK!', key="-START-", s=(15,1.2)), sg.Button('Cancel', key="-CANCEL-", s=(15,1.2))]]
 
-window = sg.Window('DAVE', layout)
+layout2 = [[sg.Text('Schul-ID:')],
+        [sg.InputText(key='-schoolID2-')],
+        [sg.Text('Pfad TRACKLIST ADMINTOOL:')], 
+        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL2-', initial_folder=folderToTracklist, s=10)],
+        [sg.T("        ", size=(10,13))],
+        [sg.Button('OK!', key="-START2-", s=(15,1.2)), sg.Button('Cancel', key="-CANCEL2-", s=(15,1.2))]]
+
+tabgrp = [[sg.TabGroup([[sg.Tab('DAVEfull', layout1),
+                        sg.Tab('Tracklist only', layout2)]])]] 
+
+window = sg.Window('DAVE', tabgrp)
 
 with open(("./dave_logo.txt"), 'r') as f:
     file_content = f.read()
@@ -39,23 +52,59 @@ while True:
     schoolID = values['-schoolID-']
     schoolName = values['-schoolName-']
     tracklist = values['-dirTL-']
+
+    schoolID2 = values['-schoolID2-'].zfill(4)
+    tracklist2 = values['-dirTL2-']
+
     cache_folder = desktop + "/cache_MM" + schoolID
 
-    if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+    if event == sg.WIN_CLOSED or event == '-CANCEL-' or event == '-CANCEL2-': # if user closes window or clicks cancel
         print("abort. see you next time!")
         break
+
+    if event == "-START2-":
+        if tracklist2 == "":
+            print('Kein Pfad -> Tracklist!')
+        else:
+            # # Excel Tabelle Admin-Tool lesen
+            excel_file = openpyxl.load_workbook(tracklist2)
+            sheet_obj = excel_file.active
+            m_row = sheet_obj.max_row
+
+            # Tracklist-Daten
+            txtFile = schoolID2 + "_tracklist.txt"
+            txt_file = open(txtFile, "w")
+
+            j = 1
+
+            for i in range(2, m_row + 1):
+                cell_obj = sheet_obj.cell(row = i, column = 1)
+                song.append(cell_obj.value)
+                cell_obj2 = sheet_obj.cell(row = i, column = 2)
+                klasse.append(cell_obj2.value)
+                try:
+                    full_row = str(j).zfill(2) + " " + cell_obj.value + " " + "(" + cell_obj2.value + ")\n" # optional for copy from txt-file, saved in original path
+                    txt_file.write(str(full_row)) # write to .txt if 3 columns (titel + (klasse))
+                except:
+                    full_row2 = str(j).zfill(2) + " " + cell_obj.value + "\n"
+                    txt_file.write(str(full_row2)) # write to .txt if 2 columns (alle kinder singen alle songs)
+                
+                j += 1
+
+            txt_file.close()
+            shutil.move(("./" + txtFile), desktop)
+            print("check desktop for tracklist!")
+
+            break
+        continue
 
     dirNAS = values['-dirNAS-']
     if dirNAS == "":
         print('Kein Pfad -> MIXFERTIG!')
 
     schoolID = values['-schoolID-']
-    try:
-        schoolID == int(schoolID)
-        if schoolID == "":
-            print('Keine Schul-ID!')
-    except:
-        print("Schul-ID kann nicht gelesen werden")
+    if schoolID == "":
+        print('Keine Schul-ID!')
 
     schoolName = values['-schoolName-']
     if schoolName == "":
@@ -63,7 +112,7 @@ while True:
 
     tracklist = values['-dirTL-']
     if tracklist == "":
-            print('Keine Pfad -> Tracklist!')
+        print('Kein Pfad -> Tracklist!')
 
     if event == '-START-' and dirNAS != "" and schoolID != "" and tracklist != "":
 
@@ -97,7 +146,8 @@ while True:
 
         # # create cache folder on desktop with cache_schoolID
         try:
-            os.mkdir(cache_folder)
+            if not os.path.exists(cache_folder):
+                os.mkdir(cache_folder)
         except OSError:
             print(cache_folder, "konnte nicht erstellt werden!")
 
@@ -172,8 +222,12 @@ while True:
 
                 song.append("Alle Lieder")
                 klasse.append(" ")
-                link.append("https://www.hoerthin.de/mp3/Minimusikersong.mp3")
-                song.append("Minimusikersong")
+                if event == "-RADIO1-":
+                    link.append("https://www.hoerthin.de/mp3/Minimusikersong.mp3")
+                    song.append("Minimusikersong")
+                else:
+                    link.append("https://www.hoerthin.de/mp3/Minimusikersong%20Xmas.mp3")
+                    song.append("Minimusikersong Xmas")
                 klasse.append("Minimusiker")
 
                 data = [link, song, klasse]
@@ -199,6 +253,7 @@ while True:
                     os.rename(os.path.join(desktop, foldername), os.path.join(desktop, foldername).replace(("cache_MM"+schoolID), ("MM"+schoolID+" "+schoolName)))
 
             # # duplicate full folder to dropbox
+            # "Macintosh HD:Users:horthin:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
             command1 = """ osascript -e '
             set dropboxFolder to "Macintosh HD:Users:minimusiker:Dropbox:Apps:FileTrip_deinecd:Uploads:__Minimusiker - xxx:"
             set desktopFolder to (path to desktop)

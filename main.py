@@ -6,8 +6,8 @@ import openpyxl
 import csv
 from itertools import zip_longest
 
-sg.theme('LightGrey1')
-font = ("Arial", 13)
+sg.theme('LightBrown1')
+font = ("Arial", 16)
 button_color = "grey"
 
 folderToTracklist = os.path.join(os.path.join(os.path.expanduser('~')), 'Downloads')
@@ -18,30 +18,55 @@ song = []
 klasse = []
 
 # gui layout
-layout1 = [[sg.Text('Pfad MIXFERTIG:', font=font)],
-        [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, s=10, button_color=button_color)],
+layout1 = [[sg.T("        ", size=(15,3))],
+        [sg.Text('Pfad MIXFERTIG:', font=font)],
+        [sg.Input(), sg.FolderBrowse('Browse', key='-dirNAS-', initial_folder=desktop, size=(12,1))],
         [sg.Text('Schul-ID:', font=font)],
         [sg.InputText(key='-schoolID-')],
         [sg.Text('Schul-Name:', font=font)],
         [sg.InputText(key='-schoolName-')],
         [sg.Text('Pfad TRACKLIST ADMINTOOL:', font=font)], 
-        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, s=10, button_color=button_color)],
+        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL-', initial_folder=folderToTracklist, size=(12,1))],
         [sg.T("        ")],
         [sg.Radio('Ganzjahr', "RADIO1", default=False, key="-RADIO1-", font=font), sg.Radio('Xmas', "RADIO1", default=True, key="-RADIO2-", font=font)],
-        [sg.T("        ")],
-        [sg.Button('OK!', key="-START-", s=(15,1.2), button_color=button_color), sg.Button('Cancel', key="-CANCEL-", s=(15,1.2), button_color=button_color)]]
+        [sg.T("        ", size=(10,14))],
+        [sg.Button('OK!', key="-START-", size=(15,1.2)), sg.Button('Cancel', key="-CANCEL-", size=(15,1.2))]]
 
-layout2 = [[sg.Text('Schul-ID:', font=font)],
+layout2 = [[sg.T("        ", size=(15,3))],
+        [sg.Text('Schul-ID:', font=font)],
         [sg.InputText(key='-schoolID2-')],
         [sg.Text('Pfad TRACKLIST ADMINTOOL:', font=font)], 
-        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL2-', initial_folder=folderToTracklist, s=10)],
-        [sg.T("        ", size=(10,13))],
-        [sg.Button('OK!', key="-START2-", s=(15,1.2)), sg.Button('Cancel', key="-CANCEL2-", s=(15,1.2))]]
+        [sg.Input(), sg.FileBrowse('Browse', key='-dirTL2-', initial_folder=folderToTracklist, size=(12,1))],
+        [sg.T("        ", size=(10,28))],
+        [sg.Button('OK!', key="-START2-", size=(15,1.2)), sg.Button('Cancel', key="-CANCEL2-", size=(15,1.2))]]
 
-tabgrp = [[sg.TabGroup([[sg.Tab('DAVE', layout1), sg.Tab('tracklist only', layout2)]], font=font)]] 
+layout3 = [[sg.T("        ")],
+        [sg.Checkbox('Mix fertig?', default=False, font=font)],
+        [sg.Checkbox('Download tracklist.xlsx aus Admintool', default=False, font=font)],
+        [sg.Checkbox('WAV-Check -> DDP erstellen?', default=False, font=font)],
+        [sg.Checkbox('tracklist.txt in Filemaker kopieren', default=False, font=font)],
+        [sg.Checkbox('Dropbox-Check', default=False, font=font)],
+        [sg.Checkbox('Transmit-Check', default=False, font=font)],
+        [sg.T("  ---------------------------------------------------------------------", font=font)],
+        [sg.Text('Dateien aus Filemaker in Dropbox', font=font)],
+        [sg.Checkbox('codes.csv', default=False, font=font)], 
+        [sg.Checkbox('minicards.pdf', default=False, font=font)],
+        [sg.Checkbox('booklet.pdf', default=False, font=font)],
+        [sg.Checkbox('label.pdf', default=False, font=font)],
+        [sg.T("  ---------------------------------------------------------------------", font=font)],
+        [sg.Text('Uploads Admintool', font=font)],
+        [sg.Checkbox('codes.csv', default=False, font=font)], 
+        [sg.Checkbox('tracklist.csv', default=False, font=font)],
+        [sg.T("        ")]
+        ]
+
+tabgrp = [[sg.TabGroup([[sg.Tab('       dave        ', layout1), sg.Tab('  tracklist only  ', layout2), sg.Tab('    checklist   ', layout3)]], font=font,
+                       title_color='grey', tab_background_color='lightgrey',selected_title_color='white',
+                       selected_background_color='grey', border_width=5)]] 
 
 window = sg.Window('DAVE', tabgrp)
 
+# "/Users/horthin/Documents/scripts/LM_DAVE/dave_logo.txt"
 with open(("./dave_logo.txt"), 'r') as f:
     file_content = f.read()
     print(file_content,"\nWaiting for input...")
@@ -284,5 +309,5 @@ while True:
             os.system(command1)
             from ftp_upload import *
             os.system("ftp_upload.py 1")
-            
+
 window.close()

@@ -230,27 +230,43 @@ while True:
                 os.makedirs(mp3_folder)
             for filename in os.listdir(cache_folder):
                 if (filename.endswith(".mp3")):
-                    source = os.path.join(cache_folder, filename)
+                    source = os.path.join((cache_folder), filename)
                     shutil.move(source, mp3_folder)
             os.listdir(mp3_folder)
             for f in os.listdir(mp3_folder):
                 os.rename(os.path.join(mp3_folder, f), os.path.join(mp3_folder, f).replace('§', ' ').title().replace('.Mp3', '.mp3'))
 
+            # # zip mp3 files
+            os.path.join(mp3_folder, shutil.make_archive("AlleLieder", 'zip', mp3_folder))
+            shutil.move(("./AlleLieder.zip"), mp3_folder)
+
             # # Rename wavs in cache_schoolID and move to /wav
             wav_folder = cache_folder + "/wav"
             if not os.path.exists(wav_folder):
                 os.makedirs(wav_folder)
-            for filename in os.listdir(cache_folder):
-                if (filename.endswith(".wav")):
-                    source = os.path.join(cache_folder, filename)
-                    shutil.move(source, wav_folder)
-            os.listdir(wav_folder)
-            for f in os.listdir(wav_folder):
-                os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
 
-            # # zip mp3 files
-            os.path.join(mp3_folder, shutil.make_archive("AlleLieder", 'zip', mp3_folder))
-            shutil.move(("./AlleLieder.zip"), mp3_folder)
+            # convert wav to wav 16bit
+            conv.wav16()
+
+            # rename 16wav files
+            for f in os.listdir(wav_folder):
+                if (f.endswith(".wav")):
+                    os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
+            
+            # make folder for 24bit wav and move 24bit wav files
+            wav2_folder = cache_folder + "/_wav"
+            if not os.path.exists(wav2_folder):
+                os.makedirs(wav2_folder)
+            for f in os.listdir(cache_folder):
+                if (f.endswith(".wav")):
+                    source = os.path.join((cache_folder), f)
+                    shutil.move(source,wav2_folder)
+
+            # remove full 24bit wav folder
+            try:
+                shutil.rmtree(wav2_folder)
+            except OSError as e:
+                print("Error: %s - %s." % (e.filename, e.strerror))
 
             # # build csv and txt with links to upload to dropbox
             while True:
@@ -263,7 +279,7 @@ while True:
 
                 song.append("Alle Lieder")
                 klasse.append(" ")
-                if event == "-RADIO1-":
+                if values['-RADIO1-'] == True:
                     link.append("https://www.hoerthin.de/mp3/Minimusikersong.mp3")
                     song.append("Minimusikersong")
                 else:
@@ -291,6 +307,7 @@ while True:
             # # rename cache_folder+schoolID to schoolID
             for foldername in os.listdir(desktop):
                 if foldername.startswith("cache_"):
+                    print(f)
                     os.rename(os.path.join(desktop, foldername), os.path.join(desktop, foldername).replace(("cache_MM"+schoolID), ("MM"+schoolID+" "+schoolName)))
 
             # # duplicate full folder to dropbox
@@ -309,5 +326,6 @@ while True:
             os.system(command1)
             from ftp_upload import *
             os.system("ftp_upload.py 1")
+            break
 
 window.close()

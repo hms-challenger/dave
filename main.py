@@ -275,7 +275,7 @@ while True:
                 while True:
                     lines = os.listdir(mp3_folder)
                     for mp3s in lines:
-                        link.append("https://www.hoerthin.de/mp3/" + schoolID + eventID + "/" + mp3s.replace(" ", "%20"))
+                        link.append("https://www.hoerthin.de/mp3/" + schoolID + "-" + eventID + "/" + mp3s.replace(" ", "%20"))
                     link.sort()
 
                     csvFile = schoolID + "-" + eventID + "_mp3Liste.csv"

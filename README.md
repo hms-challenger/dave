@@ -16,4 +16,4 @@ little helper at work (currently my most useful script. even my collegues know h
 - delete from main.py -> done
 - better gui (maybe some kind of an offline webpage, with multiple tabs for just parts of dave: downloading, creating txt, converting to mp3, the whole thing, ...)
 - communication with filemaker database -> getting all the necessary infos instead of user-input
-- uploading tracklist.csv and codes.csv to mysql-server (awaiting server-relocation, because of missing root rights)
+- uploading tracklist.csv and codes.csv to mysql-server and getting event-ID from mysql-server (awaiting server-relocation, because of missing root rights)

@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 __pycache__/
+venv/
 
 *.wav
 *.mp3
@@ -10,4 +11,3 @@ cache_
 
 config.py
 test.py
-venv

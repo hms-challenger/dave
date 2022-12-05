@@ -207,11 +207,10 @@ while True:
         print("1. wav check!")
         print("2. copy tracklist to clipboard!")
         print("\n... waiting for user input ...")
-        userInput = input("3. go? [yes|no] ")
-        print("-------------------------------------------------------------\n")
 
         while True:
-            userInput = input("go? [yes|no] ")
+            userInput = input("3. go? [yes|no] ")
+            print("-------------------------------------------------------------\n")
             if userInput == "no" or userInput == "No" or userInput == "NO" or userInput == "n":
                 # # delete cache Folder 
                 try:
@@ -332,5 +331,7 @@ while True:
             else:
                 print("value error. try again.")
                 continue
+        
+        break
 
 window.close()

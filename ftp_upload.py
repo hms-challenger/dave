@@ -41,6 +41,9 @@ for folderName in os.listdir(desktop):
         base = desktop + "/" + folderName
         splitFolderName = folderName.split()
         schoolID = splitFolderName[0][2:]
+        print("\n-------------------------------------------------------------")
+        print("folder created on sftp-server: ", schoolID)
+        print("-------------------------------------------------------------\n")
 
 mp3Folder = base + "/mp3"
 uploadFolder = base + "/" + str(schoolID)

@@ -68,7 +68,7 @@ tabgrp = [[sg.TabGroup([[sg.Tab('       dave        ', layout1), sg.Tab('  track
 
 window = sg.Window('DAVE', tabgrp)
 
-# "/Users/horthin/Documents/scripts/dave/dave_logo.txt"
+# "/Users/horthin/Documents/scripts/LM_DAVE/dave_logo.txt"
 with open(("./dave_logo.txt"), 'r') as f:
     file_content = f.read()
     print(file_content,"\nWaiting for input...")
@@ -302,6 +302,7 @@ while True:
 
                 # upload files to mysql -> file using customer_id(schoolID), event_id
                 # soon to come
+
                 # # copy csv and txt files to cache folder
                 shutil.move((desktop + "/" + txtFile), cache_folder)
                 shutil.move(("./" + csvFile), cache_folder)

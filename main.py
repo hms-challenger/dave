@@ -302,7 +302,6 @@ while True:
 
                 # upload files to mysql -> file using customer_id(schoolID), event_id
                 # soon to come
-
                 # # copy csv and txt files to cache folder
                 shutil.move((desktop + "/" + txtFile), cache_folder)
                 shutil.move(("./" + csvFile), cache_folder)

@@ -199,9 +199,24 @@ while True:
             for file in os.listdir(dirNAS):
                 if file.endswith(".wav") == True:
                     wav_file = dirNAS + "/" + file
-                    shutil.copy(wav_file, cache_folder)       
+                    shutil.copy(wav_file, cache_folder)
         except:
             print("kein pfad vorhanden")
+
+        # # Rename wavs in cache_schoolID and move to /wav
+        wav_folder = cache_folder + "/wav"
+        if not os.path.exists(wav_folder):
+            os.makedirs(wav_folder)
+
+        # convert wav to wav 16bit
+        conv = mp3_converter(cache_folder, ".wav", "mp3")
+        conv.lower_underscore()
+        conv.wav16()
+
+        # rename 16wav files
+        for f in os.listdir(wav_folder):
+            if (f.endswith(".wav")):
+                os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
 
         print("\n-------------------------------------------------------------")
         print("1. wav check!")
@@ -222,8 +237,6 @@ while True:
                 break
             elif userInput == "yes" or userInput == "Yes" or userInput == "YES" or userInput == "y":
                 # # Convert wav to mp3
-                conv = mp3_converter(cache_folder, ".wav", "mp3")
-                conv.lower_underscore()
                 conv.mp3()
 
                 # # Rename mp3s in cache_schoolID and move to /mp3
@@ -232,7 +245,7 @@ while True:
                     os.makedirs(mp3_folder)
                 for filename in os.listdir(cache_folder):
                     if (filename.endswith(".mp3")):
-                        source = os.path.join((cache_folder), filename)
+                        source = os.path.join(cache_folder, filename)
                         shutil.move(source, mp3_folder)
                 os.listdir(mp3_folder)
                 for f in os.listdir(mp3_folder):
@@ -242,19 +255,6 @@ while True:
                 os.path.join(mp3_folder, shutil.make_archive("AlleLieder", 'zip', mp3_folder))
                 shutil.move(("./AlleLieder.zip"), mp3_folder)
 
-                # # Rename wavs in cache_schoolID and move to /wav
-                wav_folder = cache_folder + "/wav"
-                if not os.path.exists(wav_folder):
-                    os.makedirs(wav_folder)
-
-                # convert wav to wav 16bit
-                conv.wav16()
-
-                # rename 16wav files
-                for f in os.listdir(wav_folder):
-                    if (f.endswith(".wav")):
-                        os.rename(os.path.join(wav_folder, f), os.path.join(wav_folder, f).replace('§', ' ').title().replace('.Wav', '.wav'))
-                
                 # make folder for 24bit wav and move 24bit wav files
                 wav2_folder = cache_folder + "/_wav"
                 if not os.path.exists(wav2_folder):
@@ -331,7 +331,6 @@ while True:
             else:
                 print("value error. try again.")
                 continue
-        
         break
 
 window.close()
